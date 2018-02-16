@@ -1,5 +1,6 @@
 let sessionId = 0
 let slackURI = ''
+
 const endpoint = '/api/'
 let myInit = { 
   headers: {
@@ -94,13 +95,12 @@ function handleServerError(err){
   if(typeof err !== 'string') err = "```\n" + JSON.stringify(err) + "\n```"
   alert('There was a problem connecting to the server.')
   myInit.method = 'POST'
-  myInit.payload = {text: err}
+  myInit.payload = JSON.stringify({text: err})
   fetch(slackURI, myInit)
     .catch(err => console.log(err))
 }
 
-
-handleServerError('jamie')
+handleServerError(sessionId)
 
 function updateStats(result){
   if(result >= 1) stats.win +=1;
@@ -207,4 +207,4 @@ function fetchSessionId(){
     })
 }
 
-fetchSessionId()
+// fetchSessionId()

@@ -1,7 +1,7 @@
 'use strict';
 
 var sessionId = 0;
-var slackURI = '';
+var slackURI = "https://hooks.slack.com/services/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";
 var endpoint = '/api/';
 var myInit = {
   headers: {
@@ -97,7 +97,7 @@ function handleServerError(err) {
   if (typeof err !== 'string') err = "```\n" + JSON.stringify(err) + "\n```";
   alert('There was a problem connecting to the server.');
   myInit.method = 'POST';
-  myInit.payload = { text: err };
+  myInit.payload = JSON.stringify({ text: err });
   fetch(slackURI, myInit).catch(function (err) {
     return console.log(err);
   });
@@ -201,5 +201,5 @@ function fetchSessionId() {
   });
 }
 
-fetchSessionId();
+// fetchSessionId()
 //# sourceMappingURL=app.js.map
