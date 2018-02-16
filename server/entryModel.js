@@ -2,11 +2,11 @@ const mongoose = require('mongoose')
 
 // define the User model schema
 const EntrySchema = new mongoose.Schema({
-  session: {
+  sessionId: {
     type: Number,
     index: { unique: true }
   },
-  results: [Number],
+  game: Array,
   stats : {
     win: Number,
     tie: Number,

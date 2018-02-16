@@ -1,5 +1,15 @@
 'use strict';
 
+var sessionId = 0;
+var endpoint = 'http://localhost:3000/api/';
+var myInit = {
+  headers: {
+    'Accept': 'application/json, text/plain, */*',
+    'Content-Type': 'application/json'
+  },
+  mode: 'cors',
+  cache: 'default'
+};
 var stats = {
   win: 0,
   tie: 0,
@@ -32,18 +42,18 @@ function handleVote(hv) {
   if (!counting) {
     var cv = chooseRandom();
     var r = determineWinner(hv, cv);
+    updateStats(r);
+    sendResults(hv, cv);
     countDown(hv, cv, r);
   }
 }
 
 function countDown(humanVote, compVote, result) {
   counting = true;
-  sendResults(humanVote, compVote);
   var count = 3;
   updateWinLossColors(0);
   var id = setInterval(run, 700);
   run();
-
   function run() {
     if (count == 0) {
       window.clearInterval(id);
@@ -58,37 +68,32 @@ function countDown(humanVote, compVote, result) {
 }
 
 function finishScreen(humanVote, compVote, result) {
-  updateStats(result);
+  updateStatsScreen(result);
   updateMoves(humanVote, compVote, result);
 }
 
 function sendResults(hv, cv) {
   var payload = JSON.stringify({
     game: [hv, cv],
+    sessionId: sessionId,
     stats: stats
   });
   //make request. 
-  var myInit = {
-    method: 'POST',
-    headers: {
-      'Accept': 'application/json, text/plain, */*',
-      'Content-Type': 'application/json'
-    },
-    body: payload,
-    mode: 'cors',
-    cache: 'default'
-  };
-  fetch('http://localhost:3000/api/test', myInit).then(function (res) {
+  myInit.method = 'POST';
+  myInit.body = payload;
+
+  fetch(endpoint + 'entry', myInit).then(function (res) {
     return res.json();
   }).then(function (json) {
     console.log(json);
   });
 }
-
 function updateStats(result) {
   if (result >= 1) stats.win += 1;else if (result == 0) stats.tie += 1;else stats.loss += 1;
   stats.total += 1;
+}
 
+function updateStatsScreen() {
   document.querySelector('.stat--number.win').innerText = stats.win;
   document.querySelector('.stat--number.tie').innerText = stats.tie;
   document.querySelector('.stat--number.loss').innerText = stats.loss;
@@ -168,4 +173,15 @@ function chooseRandom() {
 function p(n, t) {
   return Math.round(n / t * 1000 / 10) + '%';
 }
+
+function fetchSessionId() {
+  myInit.method = 'GET';
+  fetch(endpoint + 'session', myInit).then(function (r) {
+    return r.json();
+  }).then(function (r) {
+    return sessionId = r.sessionId;
+  });
+}
+
+fetchSessionId();
 //# sourceMappingURL=app.js.map

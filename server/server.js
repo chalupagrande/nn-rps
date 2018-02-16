@@ -3,6 +3,7 @@ const cors = require('cors')
 const bodyParser = require('body-parser')
 const db = require('./db')
 const EntryModel = require('./entryModel')
+let sessionId = 0
 
 const app = express()
 const apiRouter = express.Router()
@@ -28,27 +29,32 @@ apiRouter.post('/test', (req,res)=>{
   res.send(d)
 })
 
+apiRouter.get('/session', (req, res)=>{
+  sessionId +=1
+  res.send({sessionId: sessionId})
+})
+
 apiRouter.post('/entry', (req, res)=>{
-  let entry = new EntryModel(req.body)
-  entry.save((err, entry) =>{
-    if(err){
-      res.send({
-        success: false,
-        msg: err
-      })
-    } else {
-      res.send({
-        success: true,
-        msg: 'Entry Saved',
-        entry,
-      })
-    }
-  })
+  let d = req.body
+  d.game = convertRPStoArray(d.game)
+  let entry = new EntryModel(d)
+  EntryModel.findOne({sessionId: d.sessionId})
+    .then((resEntry) => {
+      if(resEntry){
+        resEntry.game.push(entry.game)
+        resEntry.stats = entry.stats
+        return resEntry.save((e,m)=>handleSave(e,m, res))
+      } else {
+        entry.game = [entry.game]
+        entry.save((e,m) => handleSave(e,m, res))
+      }
+    })
+    .catch(err => handleError(err, res))
+                              
 })
 
 app.listen(port)
 console.log(`listening on ${port}`)
-
 
 /*
   HELPERS
@@ -60,4 +66,14 @@ function convertRPStoArray(game){
     'scissors': [0,0,1]
   }
   return game.map(e => key[e])
+}
+
+function handleSave(err, model, res){
+  if(err) return handleError(err, res)
+  else return res.send({success: true, model})
+}
+
+function handleError(err, res){
+  console.log(err)
+  return res.send({success: false, msg: err})
 }
