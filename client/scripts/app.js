@@ -1,7 +1,7 @@
 'use strict';
 
 var sessionId = 0;
-var endpoint = 'http://localhost:3000/api/';
+var endpoint = '/api/';
 var myInit = {
   headers: {
     'Accept': 'application/json, text/plain, */*',
@@ -86,8 +86,14 @@ function sendResults(hv, cv) {
     return res.json();
   }).then(function (json) {
     console.log(json);
-  });
+    if (!json.success) handleServerError(json.msg);
+  }).catch(err, handleServerError(err));
 }
+
+function handleServerError(err) {
+  alert('There was an error training the Neural Net.\n Please let Jamie know as soon as possible.');
+}
+
 function updateStats(result) {
   if (result >= 1) stats.win += 1;else if (result == 0) stats.tie += 1;else stats.loss += 1;
   stats.total += 1;

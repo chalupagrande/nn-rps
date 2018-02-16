@@ -1,5 +1,5 @@
 let sessionId = 0
-const endpoint = 'http://localhost:3000/api/'
+const endpoint = '/api/'
 let myInit = { 
   headers: {
         'Accept': 'application/json, text/plain, */*',

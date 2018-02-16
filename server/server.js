@@ -2,7 +2,6 @@ const express = require('express')
 const cors = require('cors')
 const request = require('request')
 const private = require('./private')
-console.log(private)
 const bodyParser = require('body-parser')
 const db = require('./db')
 const EntryModel = require('./entryModel')
@@ -28,8 +27,7 @@ apiRouter.get('/', (req, res)=>{
 
 apiRouter.post('/test', (req,res)=>{
   console.log(req.body)
-  let d = convertRPStoArray(req.body.game)
-  res.send(d)
+  res.send('recieved ' + req.body)
 })
 
 apiRouter.get('/session', (req, res)=>{
@@ -54,6 +52,34 @@ apiRouter.post('/entry', (req, res)=>{
     })
     .catch(err => handleError(err, res))
                               
+})
+
+apiRouter.get('/entry', (req, res)=>{
+  EntryModel.findOne({sessionId: req.body.sessionId})
+    .then(resEntry =>{
+      if(resEntry) res.send({
+        success: true,
+        body: resEntry,
+      })
+      else res.send({
+        success: false,
+        msg: 'No entry found'
+      })
+    })
+})
+
+apiRouter.get('/entry/all', (req, res)=>{
+  EntryModel.find({})
+    .then(resEntry =>{
+      if(resEntry) res.send({
+        success: true,
+        body: resEntry,
+      })
+      else res.send({
+        success: false,
+        msg: 'No entry found'
+      })
+    })
 })
 
 app.listen(port)
@@ -83,7 +109,7 @@ function handleError(err, res){
 }
 
 function sendErrorRequest(err){
-  if(typeof err !== 'string') err = JSON.stringify(err)
+  if(typeof err !== 'string') err = "```\n" + JSON.stringify(err) + "\n```"
   request({
     method: 'POST',
     url: private.slackAdress,
