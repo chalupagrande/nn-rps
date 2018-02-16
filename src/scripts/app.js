@@ -1,4 +1,5 @@
 let sessionId = 0
+let slackURI = ''
 const endpoint = '/api/'
 let myInit = { 
   headers: {
@@ -86,12 +87,20 @@ function sendResults(hv,cv){
     console.log(json)
     if(!json.success) handleServerError(json.msg)
   })
-  .catch(err, handleServerError(err))
+  .catch(err => handleServerError(err))
 }
 
 function handleServerError(err){
-  alert('There was an error training the Neural Net.\n Please let Jamie know as soon as possible.')
+  if(typeof err !== 'string') err = "```\n" + JSON.stringify(err) + "\n```"
+  alert('There was a problem connecting to the server.')
+  myInit.method = 'POST'
+  myInit.payload = {text: err}
+  fetch(slackURI, myInit)
+    .catch(err => console.log(err))
 }
+
+
+handleServerError('jamie')
 
 function updateStats(result){
   if(result >= 1) stats.win +=1;
@@ -192,7 +201,10 @@ function fetchSessionId(){
   myInit.method = 'GET'
   fetch(endpoint+'session', myInit)
     .then(r=>r.json())
-    .then(r=>sessionId = r.sessionId)
+    .then(r=>{
+      sessionId = r.sessionId
+      slackURI = r.slackURI
+    })
 }
 
 fetchSessionId()

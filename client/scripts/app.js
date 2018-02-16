@@ -1,6 +1,7 @@
 'use strict';
 
 var sessionId = 0;
+var slackURI = '';
 var endpoint = '/api/';
 var myInit = {
   headers: {
@@ -87,12 +88,22 @@ function sendResults(hv, cv) {
   }).then(function (json) {
     console.log(json);
     if (!json.success) handleServerError(json.msg);
-  }).catch(err, handleServerError(err));
+  }).catch(function (err) {
+    return handleServerError(err);
+  });
 }
 
 function handleServerError(err) {
-  alert('There was an error training the Neural Net.\n Please let Jamie know as soon as possible.');
+  if (typeof err !== 'string') err = "```\n" + JSON.stringify(err) + "\n```";
+  alert('There was a problem connecting to the server.');
+  myInit.method = 'POST';
+  myInit.payload = { text: err };
+  fetch(slackURI, myInit).catch(function (err) {
+    return console.log(err);
+  });
 }
+
+handleServerError('jamie');
 
 function updateStats(result) {
   if (result >= 1) stats.win += 1;else if (result == 0) stats.tie += 1;else stats.loss += 1;
@@ -185,7 +196,8 @@ function fetchSessionId() {
   fetch(endpoint + 'session', myInit).then(function (r) {
     return r.json();
   }).then(function (r) {
-    return sessionId = r.sessionId;
+    sessionId = r.sessionId;
+    slackURI = r.slackURI;
   });
 }
 

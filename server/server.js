@@ -33,7 +33,10 @@ apiRouter.post('/test', (req,res)=>{
 
 apiRouter.get('/session', (req, res)=>{
   sessionId +=1
-  res.send({sessionId: sessionId})
+  res.send({
+    sessionId: sessionId,
+    slackURI: process.env.SLACK_URI
+  })
 })
 
 apiRouter.post('/entry', (req, res)=>{
