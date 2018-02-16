@@ -84,8 +84,15 @@ function sendResults(hv,cv){
   })
   .then((json)=>{
     console.log(json)
+    if(!json.success) handleServerError(json.msg)
   })
+  .catch(err, handleServerError(err))
 }
+
+function handleServerError(err){
+  alert('There was an error training the Neural Net.\n Please let Jamie know as soon as possible.')
+}
+
 function updateStats(result){
   if(result >= 1) stats.win +=1;
   else if(result == 0) stats.tie +=1;

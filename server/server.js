@@ -1,5 +1,8 @@
 const express = require('express')
 const cors = require('cors')
+const request = require('request')
+const private = require('./private')
+console.log(private)
 const bodyParser = require('body-parser')
 const db = require('./db')
 const EntryModel = require('./entryModel')
@@ -75,5 +78,18 @@ function handleSave(err, model, res){
 
 function handleError(err, res){
   console.log(err)
+  sendErrorRequest(err)
   return res.send({success: false, msg: err})
 }
+
+function sendErrorRequest(err){
+  if(typeof err !== 'string') err = JSON.stringify(err)
+  request({
+    method: 'POST',
+    url: private.slackAdress,
+    body: {text: err},
+    json: true
+  })
+}
+
+sendErrorRequest('this is my err')
