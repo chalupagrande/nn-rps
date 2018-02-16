@@ -1,0 +1,71 @@
+body {
+  font-size: 16px;
+  box-sizing: border-box;
+  font-family: Helvetica; }
+
+.wrapper {
+  min-height: 100vh;
+  max-width: 800px;
+  min-width: 500px;
+  margin: 0;
+  padding: 0.5rem; }
+
+ul {
+  margin: 0;
+  padding: 0; }
+
+.description {
+  font-family: 'Times New Roman', Times, serif; }
+
+*, *:before, *:after {
+  box-sizing: border-box; }
+
+.game {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  width: 100%; }
+
+.stats {
+  display: flex;
+  justify-content: space-around;
+  width: 100%; }
+
+.player {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  text-align: center;
+  min-width: 250px; }
+
+.head {
+  min-height: 300px;
+  margin-bottom: 2rem; }
+
+.choice {
+  font-weight: 700;
+  font-size: 3rem;
+  margin: 0;
+  padding: 0;
+  text-align: center; }
+
+.choice.win {
+  color: green; }
+
+.choice.loss {
+  color: red; }
+
+button {
+  font-size: 1rem;
+  margin-right: 0.5rem; }
+
+.label {
+  margin: 0.5rem 0; }
+
+.pic {
+  width: 150px; }
+
+.prev-moves {
+  min-height: 300px; }
+
+/*# sourceMappingURL=styles.css.map */
