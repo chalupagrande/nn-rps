@@ -1,7 +1,8 @@
 const express = require('express')
 const cors = require('cors')
 const request = require('request')
-const private = require('./private')
+// const private = require('./private')
+
 const bodyParser = require('body-parser')
 const db = require('./db')
 const EntryModel = require('./entryModel')
@@ -112,7 +113,7 @@ function sendErrorRequest(err){
   if(typeof err !== 'string') err = "```\n" + JSON.stringify(err) + "\n```"
   request({
     method: 'POST',
-    url: private.slackAdress,
+    url: process.env.SLACK_URI,
     body: {text: err},
     json: true
   })
