@@ -2,15 +2,9 @@
 
 var sessionId = 0;
 var slackURI = "https://hooks.slack.com/services/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";
+
 var endpoint = '/api/';
-var myInit = {
-  headers: {
-    'Accept': 'application/json, text/plain, */*',
-    'Content-Type': 'application/json'
-  },
-  mode: 'cors',
-  cache: 'default'
-};
+
 var stats = {
   win: 0,
   tie: 0,
@@ -79,9 +73,16 @@ function sendResults(hv, cv) {
     sessionId: sessionId,
     stats: stats
   });
-  //make request. 
-  myInit.method = 'POST';
-  myInit.body = payload;
+  var myInit = {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json, text/plain, */*',
+      'Content-Type': 'application/json'
+    },
+    body: payload,
+    mode: 'cors',
+    cache: 'default'
+  };
 
   fetch(endpoint + 'entry', myInit).then(function (res) {
     return res.json();
@@ -92,18 +93,6 @@ function sendResults(hv, cv) {
     return handleServerError(err);
   });
 }
-
-function handleServerError(err) {
-  if (typeof err !== 'string') err = "```\n" + JSON.stringify(err) + "\n```";
-  alert('There was a problem connecting to the server.');
-  myInit.method = 'POST';
-  myInit.payload = JSON.stringify({ text: err });
-  fetch(slackURI, myInit).catch(function (err) {
-    return console.log(err);
-  });
-}
-
-handleServerError('jamie');
 
 function updateStats(result) {
   if (result >= 1) stats.win += 1;else if (result == 0) stats.tie += 1;else stats.loss += 1;
@@ -192,7 +181,15 @@ function p(n, t) {
 }
 
 function fetchSessionId() {
-  myInit.method = 'GET';
+  var myInit = {
+    method: 'GET',
+    headers: {
+      'Accept': 'application/json, text/plain, */*',
+      'Content-Type': 'application/json'
+    },
+    mode: 'cors',
+    cache: 'default'
+  };
   fetch(endpoint + 'session', myInit).then(function (r) {
     return r.json();
   }).then(function (r) {
@@ -201,5 +198,9 @@ function fetchSessionId() {
   });
 }
 
-// fetchSessionId()
+function handleServerError(err) {
+  alert('There was a problem connecting to the server.');
+  console.log(err);
+}
+fetchSessionId();
 //# sourceMappingURL=app.js.map

@@ -1,15 +1,8 @@
 let sessionId = 0
-let slackURI = ''
+let slackURI = "https://hooks.slack.com/services/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"
 
 const endpoint = '/api/'
-let myInit = { 
-  headers: {
-        'Accept': 'application/json, text/plain, */*',
-        'Content-Type': 'application/json'
-    },
-  mode: 'cors',
-  cache: 'default'
-};
+
 const stats = {
   win: 0,
   tie: 0,
@@ -76,9 +69,16 @@ function sendResults(hv,cv){
     sessionId,
     stats
   })
-  //make request. 
-  myInit.method = 'POST'
-  myInit.body = payload
+  let myInit = { 
+    method: 'POST',
+    headers: {
+          'Accept': 'application/json, text/plain, */*',
+          'Content-Type': 'application/json'
+      },
+    body: payload,
+    mode: 'cors',
+    cache: 'default'
+  };
 
   fetch(endpoint+'entry', myInit)
   .then((res)=>{
@@ -90,17 +90,6 @@ function sendResults(hv,cv){
   })
   .catch(err => handleServerError(err))
 }
-
-function handleServerError(err){
-  if(typeof err !== 'string') err = "```\n" + JSON.stringify(err) + "\n```"
-  alert('There was a problem connecting to the server.')
-  myInit.method = 'POST'
-  myInit.payload = JSON.stringify({text: err})
-  fetch(slackURI, myInit)
-    .catch(err => console.log(err))
-}
-
-handleServerError(sessionId)
 
 function updateStats(result){
   if(result >= 1) stats.win +=1;
@@ -196,9 +185,16 @@ function p(n,t){
   return Math.round(((n/t)*1000)/10) + '%'
 }
 
-
 function fetchSessionId(){
-  myInit.method = 'GET'
+  let myInit = { 
+    method: 'GET',
+    headers: {
+          'Accept': 'application/json, text/plain, */*',
+          'Content-Type': 'application/json'
+      },
+    mode: 'cors',
+    cache: 'default'
+  };
   fetch(endpoint+'session', myInit)
     .then(r=>r.json())
     .then(r=>{
@@ -207,4 +203,8 @@ function fetchSessionId(){
     })
 }
 
-// fetchSessionId()
+function handleServerError(err){
+  alert('There was a problem connecting to the server.')
+  console.log(err)
+}
+fetchSessionId()
