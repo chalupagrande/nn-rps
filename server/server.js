@@ -113,13 +113,16 @@ function handleError(err, res){
 }
 
 function sendErrorRequest(err){
-  if(typeof err !== 'string') err = "```\n" + JSON.stringify(err) + "\n```"
+  let str = err
+  if(typeof err != 'string'){
+    str = "```\n" + JSON.stringify + "\n```"
+  } 
   request({
     method: 'POST',
     uri: process.env.SLACK_URI,
-    body: {text: err},
+    body: {text: str},
     json: true
   })
 }
-console.log(process.env.slackURI)
+console.log(process.env.SLACK_URI)
 sendErrorRequest('this is my err')
