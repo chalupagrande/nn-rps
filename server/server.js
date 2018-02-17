@@ -119,10 +119,12 @@ function sendErrorRequest(err){
   } 
   request({
     method: 'POST',
-    uri: process.env.SLACK_URI,
+    uri: "https://hooks.slack.com/services/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",
     body: {text: str},
     json: true
+  },(err, a)=>{
+    if(err) console.log('ERROR', err)
+    else console.log(a)
   })
+ 
 }
-console.log(process.env.SLACK_URI)
-sendErrorRequest('this is my err')
