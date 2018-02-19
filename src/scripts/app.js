@@ -1,3 +1,6 @@
+const synaptic = require('synaptic')
+console.log(synaptic)
+
 let sessionId = 0
 let slackURI = "https://hooks.slack.com/services/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"
 
