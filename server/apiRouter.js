@@ -35,8 +35,8 @@ apiRouter.get('/session', (req, res)=>{
   ENTRY
 ~~~~~~~~~~~~~~~~~~~~ */
 apiRouter.post('/entry', (req, res)=>{
-  console.log('sessionID: ', sessionId)
   let d = req.body
+  console.log('updating sessiong: ' + d.sessionId)
   d.game = convertRPStoArray(d.game)
   let entry = new EntryModel(d)
   EntryModel.findOneAndUpdate({sessionId: d.sessionId},
@@ -109,7 +109,7 @@ function handleError(err, res){
 function sendErrorRequest(err){
   let str = err
   if(typeof err != 'string'){
-    str = "```\n" + JSON.stringify + "\n```"
+    str = "```\n" + JSON.stringify(err) + "\n```"
   } 
   request({
     method: 'POST',
