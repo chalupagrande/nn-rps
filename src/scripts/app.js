@@ -171,6 +171,7 @@ function fetchSessionId(){
     .then(r=>{
       sessionId = r.sessionId
       slackURI = r.slackURI
+      console.log(sessionId)
     })
 }
 

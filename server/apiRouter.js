@@ -1,6 +1,7 @@
 // Imports
 const express = require('express')
 const EntryModel = require('./entryModel')
+const SessionModel = require('./sessionModel')
 const {convertRPStoArray} = require('../helpers')
 const bodyParser = require('body-parser')
 const cors = require('cors')
@@ -25,27 +26,17 @@ apiRouter.post('/test', (req,res)=>{
 })
 
 apiRouter.get('/session', (req, res)=>{
-  EntryModel.findOneAndUpdate({sessionMasterId: true}, {sessionId: $inc})
-    .then(idobj => res.send({
-      sessionId: idobj.sessionId
-    }))
+  SessionModel.findOneAndUpdate({sessionMasterId: true}, {$inc: {sessionId: 1}})
+    .then(idobj => res.send({sessionId: idobj.sessionId}))
+    .catch(err => handleError(err, res))
 })
 
 apiRouter.post('/entry', (req, res)=>{
   let d = req.body
   d.game = convertRPStoArray(d.game)
   let entry = new EntryModel(d)
-  EntryModel.findOne({sessionId: d.sessionId})
-    .then((resEntry) => {
-      if(resEntry){
-        resEntry.game.push(entry.game)
-        resEntry.stats = entry.stats
-        return resEntry.save((e,m)=>handleSave(e,m, res))
-      } else {
-        entry.game = [entry.game]
-        entry.save((e,m) => handleSave(e,m, res))
-      }
-    })
+  EntryModel.findOneAndUpdate({sessionId: d.sessionId}, {$push: {game: d.game}})
+    .then(resEntry => handleSave(resEntry, res))
     .catch(err => handleError(err, res))
                               
 })
@@ -81,9 +72,8 @@ apiRouter.get('/entry/all', (req, res)=>{
 /*
   HELPERS
 ~~~~~~~~~~~~~~~~~~~~ */
-function handleSave(err, model, res){
-  if(err) return handleError(err, res)
-  else return res.send({success: true, model})
+function handleSave(model, res){
+  return res.send({success: true, model})
 }
 
 function handleError(err, res){

@@ -1,10 +1,10 @@
 const express = require('express')
 const apiRouter = require('./apiRouter')
-const EntryModel = require('./entryModel')
+const SessionModel = require('./sessionModel')
 const dbConnection = require('./db')
 
 //set original sessions
-EntryModel.findOneAndUpdate({
+SessionModel.findOneAndUpdate({
                               sessionMasterId: true
                             },{
                               sessionMasterId: true,

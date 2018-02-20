@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 
 // define the User model schema
 const sessionSchema = new mongoose.Schema({
-  sessionMasterId: true,
+  sessionMasterId: Boolean,
   sessionId: Number
 });
 
