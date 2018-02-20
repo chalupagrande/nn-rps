@@ -1,10 +1,8 @@
-const synaptic = require('synaptic')
-console.log(synaptic)
+import {determineWinner, chooseRandom, p} from '../../helpers';
 
 let sessionId = 0
 let slackURI = "https://hooks.slack.com/services/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"
 
-const endpoint = '/api/'
 
 const stats = {
   win: 0,
@@ -83,7 +81,7 @@ function sendResults(hv,cv){
     cache: 'default'
   };
 
-  fetch(endpoint+'entry', myInit)
+  fetch('/api/entry', myInit)
   .then((res)=>{
     return res.json()
   })
@@ -158,36 +156,6 @@ function updateMoves(h,c,r){
   cl.prepend(cc)
 }
 
-function determineWinner(c1, c2){
-  if(c1 == 'rock'){
-    if(c2 == 'rock') return 0
-    if(c2 == 'scissors') return 1
-    if(c2 == 'paper') return -1
-  }
-  else if(c1 == 'paper'){
-    if(c2 == 'paper') return 0
-    else if(c2 == 'rock') return 1
-    else if(c2 == 'scissors') return -1
-  }
-  else if(c1 == 'scissors'){
-    if(c2 == 'scissors') return 0
-    else if(c2 == 'paper') return 1
-    else if(c2 == 'rock') return -1
-  }
-}
-
-// Choose random play. Rock, Paper, or Scissors
-function chooseRandom(){
-  const choices = ['rock', 'paper', 'scissors']
-  return choices[Math.floor(Math.random()*3)]
-}
-
-// Helper functions
-//conver to percent
-function p(n,t){
-  return Math.round(((n/t)*1000)/10) + '%'
-}
-
 function fetchSessionId(){
   let myInit = { 
     method: 'GET',
@@ -198,7 +166,7 @@ function fetchSessionId(){
     mode: 'cors',
     cache: 'default'
   };
-  fetch(endpoint+'session', myInit)
+  fetch('/api/session', myInit)
     .then(r=>r.json())
     .then(r=>{
       sessionId = r.sessionId
