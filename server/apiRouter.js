@@ -86,7 +86,7 @@ apiRouter.get('/net', (req, res)=>{
     .then((allEntries)=>{
       let games = combineGames(allEntries)
       let annette = createAndTrainPerceptron(games, 5)
-      res.send({success: true, net: annette})
+      res.send({success: true, net: annette.standalone()})
     })
 })
 /*
