@@ -35,11 +35,17 @@ apiRouter.get('/session', (req, res)=>{
   ENTRY
 ~~~~~~~~~~~~~~~~~~~~ */
 apiRouter.post('/entry', (req, res)=>{
+  console.log('sessionID: ', sessionId)
   let d = req.body
   d.game = convertRPStoArray(d.game)
   let entry = new EntryModel(d)
-  EntryModel.findOneAndUpdate({sessionId: d.sessionId}, {$push: {game: d.game}})
-    .then(resEntry => handleSave(resEntry, res))
+  EntryModel.findOneAndUpdate({sessionId: d.sessionId},
+                              {$push: {game: d.game}},
+                              {upsert: true})
+    .then((resEntry) => {
+      console.log(resEntry)
+      handleSave(resEntry, res)
+    })
     .catch(err => handleError(err, res))
                               
 })
