@@ -2,3 +2,4 @@ node_modules
 /server/private.js
 /client/scripts/*.js.map
 .vscode
+rawdata.2.21.18.js
