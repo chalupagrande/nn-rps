@@ -1,5 +1,3 @@
-const EntryModel = require('./entryModel')
-
 const {Architect,
       Network,
       Neuron,
@@ -8,8 +6,8 @@ const {Architect,
 
 
 //create Annette to predict users next move
-function createAndTrain(games, toRemember){
-  let annette = new Architect.LSTM(toRemember * 3, Math.ceil(0.75*toRemember),3)
+function createAndTrainPerceptron(games, toRemember){
+  let annette = new Architect.Perceptron(toRemember * 3, Math.ceil(0.75*toRemember),3)
   for(let i = toRemember; i<games.length; i++){
     let inputs = []
     for(let j = toRemember; j>0;j--){
@@ -22,7 +20,7 @@ function createAndTrain(games, toRemember){
   return annette
 }
 
-//AS OF 2/19/18:
+//AS OF 2/19/18: from user perspective
 // let results = {
 //   "wins":602,
 //   "losses":657,
@@ -44,4 +42,6 @@ function createAndTrain(games, toRemember){
 //   lossPercentage: 35.11,
 // }
 
-// module.exports = analyzeResults
+module.exports = {
+    createAndTrainPerceptron
+  }

@@ -101,7 +101,9 @@ function p(n,t){
   return Math.round(((n/t)*1000)/10) + '%'
 }
 
+
 module.exports = {
+  combineGames,
   determineWinner,
   chooseRandom,
   p,

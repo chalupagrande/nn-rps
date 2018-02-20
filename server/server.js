@@ -1,6 +1,6 @@
 const express = require('express')
 const apiRouter = require('./apiRouter')
-const SessionModel = require('./sessionModel')
+const SessionModel = require('./models/sessionModel')
 const dbConnection = require('./db')
 
 //set original sessions
@@ -23,8 +23,6 @@ const host = process.env.HOST || 'localhost';
 
 app.use('/', express.static('client'))
 app.use('/api', apiRouter)
-
-
 
 app.listen(port)
 console.log(`listening on ${port}`)

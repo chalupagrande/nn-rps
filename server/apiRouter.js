@@ -1,8 +1,9 @@
 // Imports
 const express = require('express')
-const EntryModel = require('./entryModel')
-const SessionModel = require('./sessionModel')
-const {convertRPStoArray} = require('../helpers')
+const EntryModel = require('./models/entryModel')
+const SessionModel = require('./models/sessionModel')
+const {convertRPStoArray, combineGames} = require('../helpers')
+const {createAndTrainPerceptron} = require('./net/annette')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const request = require('request')
@@ -16,21 +17,23 @@ apiRouter.use(bodyParser.urlencoded({extended: false}))
 apiRouter.use(bodyParser.json())
 
 //set endpounts
+
 apiRouter.get('/', (req, res)=>{
   res.send("You've reached the Neural Net API.")
 })
 
-apiRouter.post('/test', (req,res)=>{
-  console.log(req.body)
-  res.send('recieved ' + req.body)
-})
-
+/*
+  SESSION
+~~~~~~~~~~~~~~~~~~~*/
 apiRouter.get('/session', (req, res)=>{
   SessionModel.findOneAndUpdate({sessionMasterId: true}, {$inc: {sessionId: 1}})
     .then(idobj => res.send({sessionId: idobj.sessionId}))
     .catch(err => handleError(err, res))
 })
 
+/*
+  ENTRY
+~~~~~~~~~~~~~~~~~~~~ */
 apiRouter.post('/entry', (req, res)=>{
   let d = req.body
   d.game = convertRPStoArray(d.game)
@@ -41,8 +44,8 @@ apiRouter.post('/entry', (req, res)=>{
                               
 })
 
-apiRouter.get('/entry', (req, res)=>{
-  EntryModel.findOne({sessionId: req.body.sessionId})
+apiRouter.get('/entry/:id', (req, res)=>{
+  EntryModel.findOne({sessionId: req.params.id})
     .then(resEntry =>{
       if(resEntry) res.send({
         success: true,
@@ -68,6 +71,21 @@ apiRouter.get('/entry/all', (req, res)=>{
       })
     })
 })
+
+/*
+  NET
+~~~~~~~~~~~~~~~~ */
+apiRouter.get('/net', (req, res)=>{
+  EntryModel.find({})
+    .then((allEntries)=>{
+      let games = combineGames(allEntries)
+      let annette = createAndTrainPerceptron(games, 5)
+      res.send({success: true, net: annette})
+    })
+})
+/*
+  STATS
+~~~~~~~~~~~~~~~~ */
 
 /*
   HELPERS
