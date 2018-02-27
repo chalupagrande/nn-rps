@@ -2,6 +2,7 @@ import {determineWinner, chooseRandom, p} from '../../helpers';
 
 let sessionId = 0
 let slackURI = "https://hooks.slack.com/services/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"
+let net = {}
 
 
 const stats = {
@@ -175,8 +176,27 @@ function fetchSessionId(){
     })
 }
 
+function fetchNet(){
+  let myInit = { 
+    method: 'GET',
+    headers: {
+          'Accept': 'application/json, text/plain, */*',
+          'Content-Type': 'application/json'
+      },
+    mode: 'cors',
+    cache: 'default'
+  };
+  fetch('/api/net', myInit)
+    .then(r=>r.json())
+    .then(r=>{
+      console.log(r)
+      net = r.net
+    })
+}
+
 function handleServerError(err){
   alert('There was a problem connecting to the server.')
   console.log(err)
 }
 fetchSessionId()
+fetchNet()
