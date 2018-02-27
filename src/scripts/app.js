@@ -189,7 +189,7 @@ function fetchNet(){
   fetch('/api/net', myInit)
     .then(r=>r.json())
     .then(r=>{
-      console.log(r)
+      console.log(r.net)
       net = r.net
     })
 }
