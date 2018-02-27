@@ -2,11 +2,13 @@
 const express = require('express')
 const EntryModel = require('./models/entryModel')
 const SessionModel = require('./models/sessionModel')
-const {convertRPStoArray, combineGames} = require('../helpers')
+const {convertRPSGametoArray, combineGames} = require('../helpers')
 const {createAndTrainPerceptron} = require('./net/annette')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const request = require('request')
+
+let Annette;
 
 // create router
 const apiRouter = new express.Router()
@@ -37,7 +39,7 @@ apiRouter.get('/session', (req, res)=>{
 apiRouter.post('/entry', (req, res)=>{
   let d = req.body
   console.log('updating sessiong: ' + d.sessionId)
-  d.game = convertRPStoArray(d.game)
+  d.game = convertRPSGametoArray(d.game)
   let entry = new EntryModel(d)
   EntryModel.findOneAndUpdate({sessionId: d.sessionId},
                               {$push: {game: d.game}},
@@ -81,14 +83,24 @@ apiRouter.get('/entry/all', (req, res)=>{
 /*
   NET
 ~~~~~~~~~~~~~~~~ */
-apiRouter.get('/net', (req, res)=>{
+
+apiRouter.get('/net/train', (req, res)=>{
   EntryModel.find({})
     .then((allEntries)=>{
       let games = combineGames(allEntries)
-      let annette = createAndTrainPerceptron(games, 5)
-      console.log(annette)
-      res.send({success: true, net: annette.standalone()})
+      global.Annette = createAndTrainPerceptron(games, 5)
+      res.send({success: true, msg: 'Annette has been trained on all previous games'})
+    }).catch(err =>{
+      console.log(err)
+      res.send({success: false, msg: err})
     })
+})
+
+apiRouter.post('/net/annette', (req, res)=>{
+  let inputs = req.body
+  console.log(inputs)
+  let result = global.Annette.activate(inputs)
+  res.send({success: true, msg: result})
 })
 /*
   STATS

@@ -7,18 +7,24 @@ const {Architect,
 
 //create Annette to predict users next move
 function createAndTrainPerceptron(games, toRemember){
-  let annette = new Architect.Perceptron(toRemember * 3, Math.ceil(0.75*toRemember),3)
+  let numInputs = toRemember*3
+  let a = new Architect.Perceptron(numInputs, Math.ceil(numInputs*0.75),3)
   for(let i = toRemember; i<games.length; i++){
     let inputs = []
     for(let j = toRemember; j>0;j--){
       //[0] position is the PLAYERS GAME
       inputs = inputs.concat(games[i-j][0])
     }
-    annette.activate(...inputs)
-    annette.propagate(...games[i][0])
+    a.activate(inputs)
+    a.propagate(0.3, games[i][0])
   }
-  return annette
+  return a
 }
+
+function createLSTM(){
+  return new Architect.LSTM.length()
+}
+
 
 //AS OF 2/19/18: from user perspective
 // let results = {
@@ -43,5 +49,5 @@ function createAndTrainPerceptron(games, toRemember){
 // }
 
 module.exports = {
-    createAndTrainPerceptron
+    createAndTrainPerceptron,
   }

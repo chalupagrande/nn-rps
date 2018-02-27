@@ -1,9 +1,16 @@
-import {determineWinner, chooseRandom, p} from '../../helpers';
+import {determineWinner,
+        chooseRandom,
+        p,
+        convertRPStoArray,
+        makeVote} from '../../helpers';
+import {sendResults,
+        trainNet,
+        fetchSessionId,
+        fetchAnnettesPrediction} from './network';
 
 let sessionId = 0
 let slackURI = "https://hooks.slack.com/services/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"
-let net = {}
-
+let lastMoves = []
 
 const stats = {
   win: 0,
@@ -32,12 +39,28 @@ window.addEventListener('keydown', e=>{
 
 // Runner Functions
 function handleVote(hv){
+  let hvEncoded = convertRPStoArray(hv)
   if(!counting){
-    let cv = chooseRandom()
-    let r = determineWinner(hv, cv)
-    updateStats(r)
-    sendResults(hv, cv)
-    countDown(hv, cv, r)
+    let cv;
+    if(lastMoves.length < 15){
+      lastMoves.push(...hvEncoded)
+      cv = chooseRandom()
+      run(hv,cv)
+    } else {
+      console.log(lastMoves)
+      fetchAnnettesPrediction(lastMoves,(p)=>{
+        let cv = makeVote(p)
+        run(hv,cv)
+      })
+      lastMoves.splice(0,3)
+      lastMoves.push(...hvEncoded)
+    }
+    function run(hv,cv){
+      let r = determineWinner(hv, cv)
+      updateStats(r)
+      sendResults(hv, cv, sessionId, stats)
+      countDown(hv, cv, r)
+    }
   }
 }
 
@@ -63,34 +86,6 @@ function countDown(humanVote, compVote, result){
 function finishScreen(humanVote, compVote, result){
   updateStatsScreen(result)
   updateMoves(humanVote, compVote, result)
-}
-
-function sendResults(hv,cv){
-  let payload = JSON.stringify({
-    game: [hv, cv],
-    sessionId,
-    stats
-  })
-  let myInit = { 
-    method: 'POST',
-    headers: {
-          'Accept': 'application/json, text/plain, */*',
-          'Content-Type': 'application/json'
-      },
-    body: payload,
-    mode: 'cors',
-    cache: 'default'
-  };
-
-  fetch('/api/entry', myInit)
-  .then((res)=>{
-    return res.json()
-  })
-  .then((json)=>{
-    console.log(json)
-    if(!json.success) handleServerError(json.msg)
-  })
-  .catch(err => handleServerError(err))
 }
 
 function updateStats(result){
@@ -157,46 +152,11 @@ function updateMoves(h,c,r){
   cl.prepend(cc)
 }
 
-function fetchSessionId(){
-  let myInit = { 
-    method: 'GET',
-    headers: {
-          'Accept': 'application/json, text/plain, */*',
-          'Content-Type': 'application/json'
-      },
-    mode: 'cors',
-    cache: 'default'
-  };
-  fetch('/api/session', myInit)
-    .then(r=>r.json())
-    .then(r=>{
-      sessionId = r.sessionId
-      slackURI = r.slackURI
-      console.log("SessionId: " + sessionId)
-    })
-}
-
-function fetchNet(){
-  let myInit = { 
-    method: 'GET',
-    headers: {
-          'Accept': 'application/json, text/plain, */*',
-          'Content-Type': 'application/json'
-      },
-    mode: 'cors',
-    cache: 'default'
-  };
-  fetch('/api/net', myInit)
-    .then(r=>r.json())
-    .then(r=>{
-      console.log(r.net)
-      net = r.net
-    })
-}
 
 function handleServerError(err){
-  alert('There was a problem connecting to the server.')
+  alert('There was a problem connecting to the server. Your results wont be recorded.')
   console.log(err)
 }
+
 fetchSessionId()
-fetchNet()
+trainNet()

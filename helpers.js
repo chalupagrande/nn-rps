@@ -7,7 +7,11 @@ const key = {
   '[0,0,1]': 'scissors',
 }
 
-function convertRPStoArray(game){
+function convertRPStoArray(entry){
+  return key[entry]
+}
+
+function convertRPSGametoArray(game){
   let key = {
     'rock': [1,0,0],
     'paper': [0,1,0],
@@ -90,6 +94,21 @@ function determineWinner(c1, c2){
     else if(c2 == 'rock') return -1
   }
 }
+function determinePrediction(predictionArray){
+  let max = predictionArray.reduce((a,b)=>Math.max(a,b), 0)
+  return predictionArray.map(e => e == max ? 1 : 0)
+}
+
+function chooseOnPrediction(prediction){
+  if(prediction[0]) return 'paper'
+  else if(prediction[1]) return 'scissors'
+  else if(prediction[2]) return 'rock'
+}
+
+function makeVote(predictionArray){
+  let p = determinePrediction(predictionArray)
+  return chooseOnPrediction(p)
+}
 
 // Choose random play. Rock, Paper, or Scissors
 function chooseRandom(){
@@ -108,5 +127,7 @@ module.exports = {
   chooseRandom,
   p,
   key,
-  convertRPStoArray
+  convertRPSGametoArray,
+  convertRPStoArray,
+  makeVote
 }

@@ -7,8 +7,7 @@ const dbConnection = require('./db')
 SessionModel.findOneAndUpdate({
                               sessionMasterId: true
                             },{
-                              sessionMasterId: true,
-                              sessionId: 1000
+                              $inc: {sessionId: 100}
                             }, {
                               upsert: true,
                             })
