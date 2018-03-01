@@ -2,13 +2,16 @@
 const express = require('express')
 const EntryModel = require('./models/entryModel')
 const SessionModel = require('./models/sessionModel')
+const {Architect} = require('synaptic')
 const {convertRPSGametoArray, combineGames} = require('../helpers')
-const {createAndTrainPerceptron} = require('./net/annette')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const request = require('request')
 
-let Annette;
+// NEURAL NETWORKS
+// 3 options (rps) * 2 players * 3 games
+let gamesToRemember = 3
+const Annette = new Architect.Perceptron(3 * 2 * gamesToRemember, 12, 3)
 
 // create router
 const apiRouter = new express.Router()
@@ -28,7 +31,9 @@ apiRouter.get('/', (req, res)=>{
   SESSION
 ~~~~~~~~~~~~~~~~~~~*/
 apiRouter.get('/session', (req, res)=>{
-  SessionModel.findOneAndUpdate({sessionMasterId: true}, {$inc: {sessionId: 1}})
+  SessionModel.findOneAndUpdate({sessionMasterId: true}, 
+                                {$inc: {sessionId: 1}},
+                                {upsert: true})
     .then(idobj => res.send({sessionId: idobj.sessionId}))
     .catch(err => handleError(err, res))
 })
@@ -38,18 +43,18 @@ apiRouter.get('/session', (req, res)=>{
 ~~~~~~~~~~~~~~~~~~~~ */
 apiRouter.post('/entry', (req, res)=>{
   let d = req.body
-  console.log('updating sessiong: ' + d.sessionId)
   d.game = convertRPSGametoArray(d.game)
   let entry = new EntryModel(d)
   EntryModel.findOneAndUpdate({sessionId: d.sessionId},
-                              {$push: {game: d.game}},
-                              {upsert: true})
+                              {$push: {game: d.game},
+                              net: ()=> console.log('jamie')},
+                              {upsert: true},)
     .then((resEntry) => {
-      console.log(resEntry)
+      trainAnnette()
       handleSave(resEntry, res)
     })
     .catch(err => handleError(err, res))
-                              
+  
 })
 
 apiRouter.get('/entry/:id', (req, res)=>{
@@ -84,27 +89,40 @@ apiRouter.get('/entry/all', (req, res)=>{
   NET
 ~~~~~~~~~~~~~~~~ */
 
-apiRouter.get('/net/train', (req, res)=>{
-  EntryModel.find({})
-    .then((allEntries)=>{
-      let games = combineGames(allEntries)
-      global.Annette = createAndTrainPerceptron(games, 5)
-      res.send({success: true, msg: 'Annette has been trained on all previous games'})
-    }).catch(err =>{
-      console.log(err)
-      res.send({success: false, msg: err})
-    })
+
+apiRouter.post('/net/annette', (req,res)=>{
+  console.log('FETCHING PREDICTION ON:',req.body)
+  let prediction = Annette.activate(req.body)
+  res.send({success: true, msg: prediction})
+
 })
 
-apiRouter.post('/net/annette', (req, res)=>{
-  let inputs = req.body
-  console.log(inputs)
-  let result = global.Annette.activate(inputs)
-  res.send({success: true, msg: result})
-})
-/*
-  STATS
-~~~~~~~~~~~~~~~~ */
+function trainAnnette(){
+  EntryModel.find({})
+    .then(games => {
+      let combinedGames = combineGames(games)
+      if(combinedGames.length >= gamesToRemember+1){
+        console.log('TRAINING ON ', combinedGames)
+        trainPerceptron(combinedGames, gamesToRemember)
+      }
+    })
+    .catch((err)=> console.log('THERE WAS AN ERROR TRAINING', err))
+}
+
+function trainPerceptron(games, toRemember){
+  let numInputs = toRemember*3*2
+  for(let i = toRemember; i<games.length; i++){
+    let inputs = []
+    for(let j = toRemember; j>0;j--){
+      //[0] position is the PLAYERS GAME
+      inputs = inputs.concat(games[i-j][0])
+      inputs = inputs.concat(games[i-j][1])
+    }
+    Annette.activate(inputs)
+    Annette.propagate(0.45, games[i][0])
+  }
+}
+
 
 /*
   HELPERS

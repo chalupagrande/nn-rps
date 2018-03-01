@@ -6,9 +6,8 @@ import {determineWinner,
 import {sendResults,
         trainNet,
         fetchSessionId,
-        fetchAnnettesPrediction} from './network';
+        fetchAnnettesPrediction} from './connections';
 
-let sessionId = 0
 let slackURI = "https://hooks.slack.com/services/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"
 let lastMoves = []
 
@@ -41,23 +40,34 @@ window.addEventListener('keydown', e=>{
 function handleVote(hv){
   let hvEncoded = convertRPStoArray(hv)
   if(!counting){
-    let cv;
-    if(lastMoves.length < 15){
-      lastMoves.push(...hvEncoded)
+    let cv, cvEncoded;
+    console.log(lastMoves)
+    if(lastMoves.length < 3*2*3 + 1){
+      console.log('choosing randomly')
+      //choose randomly at first.
       cv = chooseRandom()
+      cvEncoded = convertRPStoArray(cv)
+      lastMoves.push(...hvEncoded, ...cvEncoded)
       run(hv,cv)
     } else {
-      console.log(lastMoves)
+      console.log('predicting')
+      //get annettes predicitions
       fetchAnnettesPrediction(lastMoves,(p)=>{
         let cv = makeVote(p)
+        cvEncoded = convertRPStoArray(cv)
         run(hv,cv)
+        lastMoves.splice(0,6)
+        lastMoves.push(...hvEncoded, ...cvEncoded)
       })
-      lastMoves.splice(0,3)
-      lastMoves.push(...hvEncoded)
+      
     }
+    
+
+
     function run(hv,cv){
       let r = determineWinner(hv, cv)
       updateStats(r)
+      let sessionId = localStorage.getItem('nn-session-id')*1
       sendResults(hv, cv, sessionId, stats)
       countDown(hv, cv, r)
     }
@@ -159,4 +169,4 @@ function handleServerError(err){
 }
 
 fetchSessionId()
-trainNet()
+// trainNet()

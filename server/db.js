@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/test'
+const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/neuralnet'
 //set Promise library for mongoose
 mongoose.Promise = global.Promise
 

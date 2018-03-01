@@ -40,9 +40,9 @@ function fetchSessionId(){
   fetch(endpoint + '/api/session', myInit)
     .then(r=>r.json())
     .then(r=>{
-      sessionId = r.sessionId
+      localStorage.setItem('nn-session-id', r.sessionId)
       slackURI = r.slackURI
-      console.log("SessionId: " + sessionId)
+      console.log("SessionId: " + r.sessionId)
     })
 }
 function fetchAnnettesPrediction(payload, cb){
@@ -60,7 +60,7 @@ function fetchAnnettesPrediction(payload, cb){
   fetch(endpoint + '/api/net/annette', myInit)
     .then(r=>r.json())
     .then(r=>{
-      console.log(r)
+      console.log('PREDICTION: ',r)
       cb(r.msg)
     })
     .catch(err => console.log(err))
