@@ -1,4 +1,4 @@
-const endpoint = 'http://localhost:3000'
+const endpoint = ''
 
 function sendResults(hv,cv, sessionId, stats){
   let payload = JSON.stringify({
