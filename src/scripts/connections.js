@@ -22,9 +22,9 @@ function sendResults(hv,cv, sessionId, stats){
     return res.json()
   })
   .then((json)=>{
+    console.log(json)
     if(!json.success) handleServerError(json.msg)
-  })
-  .catch(err => handleServerError(err))
+  }).catch(err => handleServerError(err))
 }
 
 function fetchSessionId(){

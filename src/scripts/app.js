@@ -62,8 +62,6 @@ function handleVote(hv){
       
     }
     
-
-
     function run(hv,cv){
       let r = determineWinner(hv, cv)
       updateStats(r)
