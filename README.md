@@ -4,7 +4,7 @@ This is a small application train a Neural Net to play Rock Paper Scissors.
 
 ## Introduction
 
-I wanted to learn more about Neural Networks and Deep Learning. This project uses [Synpatic](https://github.com/cazala/synaptic) (a javascript neural network library for NodeJS and the Browser) to create the Nearal Networks. I wanted to see if I could design a Neural Network that would win in Rock Paper Scissors a statistically significant about of times above random. This project and right up are official entries into the Austin Recreation Center's Science Fair Competition.
+I wanted to learn more about Neural Networks and Deep Learning. This project uses [Synpatic](https://github.com/cazala/synaptic) (a javascript neural network library for NodeJS and the Browser) to create the Neural Networks. I wanted to see if I could design a Neural Network that would win in Rock Paper Scissors a statistically significant amount of times above random. This project and write up are official entries into the Austin Recreation Center's Science Fair Competition.
 
 ## Materials
 - SynapticJS
@@ -54,7 +54,7 @@ After a database of Human played RPS games was created, I wrote an algorithm to 
 
 
 ## Data
-The inital dataset gathered from the Random Choice Network, was as follows: 
+The initial dataset gathered from the Random Choice Network, was as follows: 
 
 ```
 //AS OF 2/19/18: from user perspective
