@@ -78,3 +78,11 @@ The initial dataset gathered from the Random Choice Network, was as follows:
    lossPercentage: 35.11,
  }
 ```
+
+## Step 4
+
+After training Annette on the dataset of random RPS plays, I released her to play real players. Every subsequent play would then be added to the dataset to further enhance Annette's predictions. 
+
+## Results
+
+Scissors. For whatever reason, Annette is a big fan of Scissors. Reflecting on the methods above, it is clear the the method of gathering data was flawed. My human participants were likely to figure out that they were not in fact playing an AI yet, and could make any RPS play they cared to, without it affecting the computers play. One human player admitted to repeating Rock, Paper, Scissors for over 100 games. Essentially this means that the data gathered does not accurately represent the way humans play RPS. Making it very difficult for Annette to choose an appropriate answer. 
